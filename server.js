@@ -6,6 +6,7 @@ const session = require('express-session');
 const db = require('./api/dbConfig')
 const bcrypt = require('bcrypt')
 const saltRound = 10
+
 const corsOptions ={
     origin:'http://localhost:3000', 
     credentials:true,            //access-control-allow-credentials:true
@@ -97,10 +98,10 @@ server.post('/auth', async(req, res)=>{
     try{
         u = await db('users').where("user", user)
         users = await db('users').where("user", user).select('pwd')
-        .then((result) => {
+        .then(async (result) => {
         if (result.length > 0) {
             const storedPassword = result[0].pwd;
-            const auth = bcrypt.compare(pwd,  storedPassword)
+            const auth = await bcrypt.compare(pwd,  storedPassword)
             if (auth) {
                 req.session.userId = u[0].id;
                 res.status(200).json({ loggedIn: true, user ,userId: u[0].id});
