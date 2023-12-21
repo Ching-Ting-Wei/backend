@@ -25,10 +25,23 @@ server.use(session({
         maxAge: 60 * 60 * 1000 // 1 小時的毫秒數
     }
   }));
+  
 // npx knex migrate:make users
 // npx knex migrate:latest
 // npx knex seed:make 001
 // npx knex seed:run
+
+server.get('/test', async(req, res) => {
+    try {
+        const posts = await db.select('Posts.*', 'Users.user')
+            .from('Posts')
+            .innerJoin('Users', 'Posts.user_id', 'Users.id');
+        
+        res.json(posts); // 回傳所有貼文及使用者資訊
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 
 server.get('/users', async(req, res)=>{
