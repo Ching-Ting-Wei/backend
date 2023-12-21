@@ -55,6 +55,16 @@ server.get('/users', async(req, res)=>{
     }
 })
 
+server.get('/getmessage', async(req, res)=>{
+    try{
+        const posts = await db('Posts')
+        res.json(posts)
+        
+    }catch(err){
+        console.log(err)
+    }
+})
+
 server.get('/checkLoginStatus', (req, res) => {
     console.log(req.session)
     console.log(req.session.userId)
@@ -74,7 +84,17 @@ server.get('/checkLoginStatus', (req, res) => {
       res.status(401).json({ loggedIn: false });
     }
 });
-  
+
+
+server.post('/newMessage', async(req, res) => {
+    const newPost = req.body
+     try{
+        await db('Posts').insert(newPost)
+        res.status(201).json({message: 'success'})
+    }catch(err){
+        console.log(err)
+    }
+}); 
 
 server.post('/logout', (req, res) => {
     req.session.destroy((err) => {
@@ -153,6 +173,18 @@ server.delete('/users/:id', async (req, res)=>{
     const {id} = req.params
     try{
         await db('users').where({id}).del()
+        res.status(200).json({message: 'delete success'})
+    }catch(err){
+        console.log(err)
+    }
+
+})
+
+server.delete('/posts/:post_id', async (req, res)=>{
+    // DELETE a user
+    const {post_id} = req.params
+    try{
+        await db('Posts').where({post_id}).del()
         res.status(200).json({message: 'delete success'})
     }catch(err){
         console.log(err)

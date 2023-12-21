@@ -15,7 +15,6 @@ exports.up = async knex => {
         table.integer('user_id').unsigned(); 
         table.string('title'); // 標題
         table.text('content'); // 子題目有幾個
-
         table.foreign('user_id').references('Users.id'); 
     });
 
