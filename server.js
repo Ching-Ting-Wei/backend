@@ -22,7 +22,7 @@ server.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {
-        maxAge: 60 * 60 * 1000 // 1 小時的毫秒數
+        maxAge: 60 * 60 * 10000 // 1 小時的毫秒數
     }
   }));
   
@@ -33,9 +33,19 @@ server.use(session({
 
 server.get('/test', async(req, res) => {
     try {
+        const posts = await db('Posts')
+        res.json(posts); // 回傳所有貼文及使用者資訊
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+server.get('/getmessage', async(req, res) => {
+    try {
         const posts = await db.select('Posts.*', 'Users.user')
             .from('Posts')
-            .innerJoin('Users', 'Posts.user_id', 'Users.id');
+            .innerJoin('Users', 'Posts.user_id', 'Users.id')
+            .orderBy('Posts.post_id', 'desc');
         
         res.json(posts); // 回傳所有貼文及使用者資訊
     } catch (error) {
@@ -53,17 +63,8 @@ server.get('/users', async(req, res)=>{
     }catch(err){
         console.log(err)
     }
-})
+});
 
-server.get('/getmessage', async(req, res)=>{
-    try{
-        const posts = await db('Posts')
-        res.json(posts)
-        
-    }catch(err){
-        console.log(err)
-    }
-})
 
 server.get('/checkLoginStatus', (req, res) => {
     console.log(req.session)
